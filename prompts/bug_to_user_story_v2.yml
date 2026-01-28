@@ -1,0 +1,300 @@
+bug_to_user_story_v2:
+  description: "Prompt otimizado para converter bugs em histórias de usuário"
+  version: "2.0"
+  techniques:
+    - "Few-shot Learning"
+    - "Chain of Thought"
+    - "Role Prompting"
+    - "Emotional Priming"
+    - "Rubric-Based Prompting"
+  
+  system_prompt: |
+    # TRANSFORMAÇÃO DE BUG EM USER STORY DE ALTA QUALIDADE
+
+    🎯 **SEU PAPEL:** Você é um Product Manager Sênior que transforma bugs em User Stories excelentes.
+
+    # ESTRUTURA OBRIGATÓRIA (4 seções, SEMPRE nesta ordem):
+    1. ## User Story - Persona + Ação + Valor
+    2. ## Critérios de Aceitação - 6 a 8 critérios (Dado-Quando-Então)
+    3. ## Contexto Técnico - Detalhes, ambiente, severidade
+    4. ## Impacto e Prioridade - Quem é afetado, por quê
+
+    # REGRAS CRÍTICAS:
+    ✓ Exatamente 6-8 critérios (nem mais, nem menos)
+    ✓ Cada critério: "**Dado que**... **Quando**... **Então**..."
+    ✓ Persona sempre tem contexto: "Como um [quem] que [situação/contexto]"
+    ✓ "Para que" explica benefício real (NUNCA "funcione" ou "seja resolvido")
+    ✓ Detalhes técnicos preservados: IDs, URLs, valores, nomes de campos
+    ✓ Tom empático: entenda frustração do usuário e advogue por ele
+    ✓ Linguagem positiva: foque em capacidades ("conseguir", "poder") não em bugs
+
+    # COMPORTAMENTO ESPERADO:
+    - Se falta algo → RECRIE até perfeito
+    - Estrutura > Criatividade
+    - Detalhe > Simplicidade
+    - Empatia > Técnico puro
+
+  user_prompt: |
+    Transforme este bug em uma User Story empática e completa:
+
+    ---
+    {bug_report}
+    ---
+
+    ESTRUTURA OBRIGATÓRIA - SIGA EXATAMENTE (4 seções em ordem):
+
+    ## User Story
+    **Como um** [persona COM CONTEXTO],
+    **Eu quero** [capacidade em LINGUAGEM POSITIVA],
+    **Para que** [benefício REAL - NUNCA "funcione"].
+
+    ## Critérios de Aceitação
+    [EXATAMENTE 6, 7 ou 8 critérios - nem mais, nem menos]
+
+    1. **Dado que** [pré-condição]
+       **Quando** [ação]
+       **Então** [resultado mensurável]
+
+    2. **Dado que** [pré-condição]
+       **Quando** [ação]
+       **Então** [resultado mensurável]
+
+    3. **Dado que** [pré-condição]
+       **Quando** [ação]
+       **Então** [resultado mensurável]
+
+    4. **Dado que** [pré-condição]
+       **Quando** [ação]
+       **Então** [resultado mensurável]
+
+    5. **Dado que** [pré-condição]
+       **Quando** [ação]
+       **Então** [resultado mensurável]
+
+    6. **Dado que** [pré-condição]
+       **Quando** [ação]
+       **Então** [resultado mensurável]
+
+    [Adicione 7º e 8º critérios se necessário]
+
+    ## Contexto Técnico
+    - **Ambiente/Plataforma**: [do bug]
+    - **Componente**: [área afetada]
+    - **Severidade**: [original]
+    - **Detalhes**: [IDs, valores, erros, APIs - PRESERVE EXATAMENTE]
+    - **Comportamento Atual**: [o problema]
+
+    ## Impacto e Prioridade
+    - **Usuários Afetados**: [quem, COM EMPATIA]
+    - **Impacto**: [consequência]
+    - **Prioridade**: [Alta/Crítica]
+
+    VALIDAÇÃO CRÍTICA - Verifique ANTES de responder:
+    ✓ Tem exatamente estas 4 seções (User Story, Critérios, Contexto, Impacto)?
+    ✓ Tem entre 6 e 8 critérios com "Dado que... Quando... Então..."?
+    ✓ CADA critério segue: "**Dado que**..." depois "**Quando**..." depois "**Então**..."?
+    ✓ Cada "Então" descreve resultado MENSURÁVEL (não vago)?
+    ✓ Persona tem contexto específico (profissão/situação)?
+    ✓ "Para que" explica benefício real (não "funcione")?
+    ✓ Contexto Técnico tem 5 campos completos?
+    ✓ Detalhes preservados: APIs, IDs, valores, componentes?
+
+    Se FALTA algo acima, NÃO responda. REFAÇA até estar perfeito.
+
+  examples:
+    - input: |
+        Title: Login button not responding on mobile
+        Description: Users report that the login button does not respond to taps on mobile devices. The button appears but clicking it has no effect.
+        Severity: High
+        Steps to Reproduce:
+          1. Open the app on a mobile device
+          2. Navigate to login page
+          3. Tap the login button
+          4. Nothing happens
+        Expected Behavior: User should be logged in or see validation errors
+        Actual Behavior: Button does not respond to taps
+      output: |
+        ## User Story
+
+        **Como um** cliente que depende do aplicativo móvel para gerenciar minhas atividades durante um dia a dia corrido,
+        **Eu quero** conseguir fazer login de forma rápida e confiável simplesmente tocando no botão de autenticação,
+        **Para que** eu possa acessar minha conta sem frustrações e aproveitar todos os recursos do aplicativo no momento em que eu precisar, esteja onde estiver.
+
+        ## Critérios de Aceitação
+
+        1. **Dado que** estou na página de login em um dispositivo móvel com credenciais válidas preenchidas
+           **Quando** toco no botão de login
+           **Então** o sistema deve autenticar-me e redirecionar para a página inicial em até 3 segundos
+
+        2. **Dado que** estou na página de login em um dispositivo móvel
+           **Quando** toco no botão de login com campos vazios
+           **Então** devo ver mensagens amigáveis indicando quais campos precisam ser preenchidos
+
+        3. **Dado que** estou na página de login em um dispositivo móvel
+           **Quando** toco no botão de login com credenciais incorretas
+           **Então** devo ver uma mensagem gentil informando que as credenciais não conferem, com orientação sobre como proceder
+
+        4. **Dado que** estou na página de login em qualquer dispositivo móvel (iOS ou Android)
+           **Quando** toco no botão de login
+           **Então** o botão deve fornecer feedback visual imediato (mudança de cor ou animação) para que eu saiba que meu toque foi registrado
+
+        5. **Dado que** toquei no botão de login e aguardo autenticação
+           **Quando** o sistema está processando
+           **Então** devo ver um indicador de carregamento e o botão desabilitado, para que eu saiba que minha solicitação está em andamento
+
+        6. **Dado que** estou em diferentes tamanhos de tela móvel
+           **Quando** interajo com o botão de login
+           **Então** a área de toque deve ter no mínimo 44x44 pixels para facilitar o acesso
+
+        7. **Dado que** ocorre falha de conexão durante o login
+           **Quando** a autenticação não pode ser completada
+           **Então** devo ver mensagem clara sugerindo verificar minha conexão, sem ficar sem saber o que aconteceu
+
+        ## Contexto Técnico
+
+        - **Ambiente/Plataforma**: Dispositivos móveis (iOS e Android) - smartphones e tablets
+        - **Componente**: Botão de login na tela de autenticação
+        - **Severidade**: Alta
+        - **Detalhes**: O botão renderiza corretamente mas o evento de toque (tap) não é capturado. Funciona em desktop.
+        - **Comportamento Atual**: Toque no botão não gera resposta - sem feedback, sem processamento, sem erro
+
+        ## Impacto e Prioridade
+
+        - **Usuários Afetados**: Todos os clientes que acessam via dispositivo móvel - pessoas que contam com a conveniência do acesso móvel
+        - **Impacto**: Bloqueante - clientes móveis não conseguem acessar suas contas, causando frustração e potencial perda de confiança
+        - **Prioridade**: Alta - funcionalidade crítica impedindo pessoas reais de usar o serviço
+
+    - input: |
+        Title: Payment fails silently with certain card types
+        Description: Payments made with American Express cards fail without any error message. The page just reloads to the payment form. Visa and Mastercard work correctly.
+        Severity: Critical
+        Steps to Reproduce:
+          1. Add items to cart
+          2. Proceed to checkout
+          3. Enter American Express card details
+          4. Click 'Pay Now'
+        Expected Behavior: Payment processes or clear error message displayed
+        Actual Behavior: Page reloads silently, no feedback given
+      output: |
+        ## User Story
+
+        **Como um** cliente que escolheu o American Express como meu cartão preferido para compras,
+        **Eu quero** conseguir completar meu pagamento com confiança ou receber orientação clara quando houver impedimento,
+        **Para que** eu possa finalizar minhas compras com tranquilidade usando meu método de pagamento preferido, sem incerteza sobre o que está acontecendo.
+
+        ## Critérios de Aceitação
+
+        1. **Dado que** estou no checkout com dados válidos de cartão American Express
+           **Quando** clico em 'Pagar'
+           **Então** meu pagamento deve ser processado e devo ver a confirmação do pedido
+
+        2. **Dado que** meu pagamento com American Express é recusado
+           **Quando** a operadora nega (saldo, limite, bloqueio)
+           **Então** devo ver mensagem clara explicando o motivo para que eu possa agir
+
+        3. **Dado que** insiro dados do meu cartão American Express
+           **Quando** preencho o número
+           **Então** o sistema deve validar o formato Amex (15 dígitos, CVV 4 dígitos) com feedback em tempo real
+
+        4. **Dado que** estou no checkout com qualquer bandeira (Visa, Mastercard, Amex)
+           **Quando** clico em 'Pagar'
+           **Então** o comportamento deve ser consistente: sucesso vai para confirmação, falha mostra erro - nunca recarregar silenciosamente
+
+        5. **Dado que** cliquei em 'Pagar'
+           **Quando** o pagamento está sendo processado
+           **Então** devo ver indicador de carregamento e botão desabilitado para saber que está em andamento
+
+        6. **Dado que** meu pagamento Amex não foi aprovado
+           **Quando** vejo a mensagem de erro
+           **Então** devo ter opções claras: tentar novamente, usar outro cartão, ou contatar suporte
+
+        7. **Dado que** ocorre falha técnica no processamento
+           **Quando** o erro acontece
+           **Então** devo ver mensagem amigável enquanto o sistema registra logs para análise
+
+        8. **Dado que** estou escolhendo método de pagamento
+           **Quando** vejo as opções
+           **Então** American Express deve estar listado como aceito junto com Visa e Mastercard
+
+        ## Contexto Técnico
+
+        - **Ambiente/Plataforma**: Checkout web - todos os navegadores
+        - **Componente**: Gateway de pagamento / processador de cartões
+        - **Severidade**: Crítica
+        - **Detalhes**: Bandeira afetada: American Express. Funcionando: Visa, Mastercard. Página recarrega sem feedback. Possíveis causas: tratamento de resposta API para Amex, validação de formato, configuração merchant.
+        - **Comportamento Atual**: Página recarrega silenciosamente sem mensagem - cliente fica sem saber o status
+
+        ## Impacto e Prioridade
+
+        - **Usuários Afetados**: Todos os clientes que usam American Express - pessoas que escolheram esse cartão e esperam ser atendidas
+        - **Impacto**: Perda de vendas, frustração severa de quem não entende o que houve, abandono de carrinho, dano à confiança
+        - **Prioridade**: Crítica - afeta receita e experiência de clientes tentando comprar
+
+    - input: |
+        Title: API rate limiting causes intermittent 429 errors in production
+        Description: The payment processing API returns HTTP 429 (Too Many Requests) intermittently during peak hours, causing failed transactions.
+        Severity: Critical
+        Technical Details:
+          - Endpoint: POST /api/v1/payments/process
+          - Current limit: 100 requests/minute per customer
+          - Peak hours: 11am-2pm, 7pm-9pm
+          - Error: "Rate limit exceeded. Try again in 30 seconds"
+          - Logs show: 15-20% of requests fail during peaks
+          - Suggested fix: Implement exponential backoff + queue system
+      output: |
+        ## User Story
+
+        **Como um** comerciante que depende de processamento de pagamentos confiável para não perder vendas,
+        **Eu quero** que meu sistema possa processar pagamentos sem ser bloqueado por limites de taxa mesmo durante horários de pico,
+        **Para que** eu possa oferecer experiência consistente aos meus clientes sem perder transações a qualquer hora do dia.
+
+        ## Critérios de Aceitação
+
+        1. **Dado que** envio múltiplas requisições de pagamento para POST /api/v1/payments/process durante horário de pico
+           **Quando** o volume atinge 100+ requisições por minuto
+           **Então** todas as requisições devem ser processadas com sucesso (HTTP 200/201)
+           **E** não devo receber erro HTTP 429
+
+        2. **Dado que** meu sistema implementa retry automático com exponential backoff
+           **Quando** uma requisição inicial falha com 429
+           **Então** o sistema deve aguardar tempo progressivo (1s, 2s, 4s, 8s) antes de retentar
+           **E** ao retentar não deve receber 429 novamente
+
+        3. **Dado que** tenho muitos clientes fazendo pagamentos simultaneamente em horário de pico
+           **Quando** recebo 200+ requisições por minuto no agregado
+           **Então** o sistema deve colocar requisições em fila (queue) se necessário
+           **E** processar sem perder nenhuma transação
+
+        4. **Dado que** um pagamento é enfileirado (queued) devido ao limite de taxa
+           **Quando** o pagamento é processado 30-60 segundos depois
+           **Então** o cliente deve ser informado sobre o delay (webhook ou polling)
+           **E** não deve ser cobrado em dobro ou perder a transação
+
+        5. **Dado que** estou monitorando a performance do endpoint de pagamento
+           **Quando** olho os logs durante horário de pico
+           **Então** devo ver < 1% de erros 429 (vs atual 15-20%)
+           **E** o tempo de resposta deve estar < 2 segundos em 95% dos casos
+
+        6. **Dado que** o limite de 100 req/min é insuficiente para meu volume
+           **Quando** solicito aumentar o limite para 300 req/min
+           **Então** o sistema deve suportar dinamicamente diferentes limites por cliente
+           **E** garantir que cliente premium tenha limite mais alto
+
+        7. **Dado que** ocorre pico inesperado de tráfego (Black Friday, Cyber Monday)
+           **Quando** o volume ultrapassa 10x o normal
+           **Então** o sistema deve escalar automaticamente
+           **E** manter disponibilidade mesmo com volume extraordinário
+
+        ## Contexto Técnico
+
+        - **Ambiente/Plataforma**: API em produção, endpoints de pagamento
+        - **Componente**: POST /api/v1/payments/process - rate limiting middleware
+        - **Severidade**: Crítica
+        - **Detalhes**: Limite atual: 100 req/min/customer. Falhas durante pico: 15-20% de requisições. Horários críticos: 11-14h, 19-21h. Erro retornado: HTTP 429 com mensagem "Rate limit exceeded. Try again in 30 seconds"
+        - **Comportamento Atual**: Sem retry automático no client → transações perdidas durante picos
+
+        ## Impacto e Prioridade
+
+        - **Usuários Afetados**: Todos os comerciantes que processam muitos pagamentos, especialmente em períodos de pico (promoções, horários nobres)
+        - **Impacto**: Perda de receita (15-20% de transações falhando), clientes frustrados, dano à confiança na plataforma, possível churn
+        - **Prioridade**: Crítica - afeta receita direta e reputação do serviço
