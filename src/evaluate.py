@@ -20,14 +20,18 @@ Configure o provider no arquivo .env através da variável LLM_PROVIDER.
 import os
 import sys
 import json
+import yaml
 from typing import List, Dict, Any
 from pathlib import Path
 from dotenv import load_dotenv
 from langsmith import Client
-from langchain import hub
 from langchain_core.prompts import ChatPromptTemplate
-from utils import check_env_vars, format_score, print_section_header, get_llm as get_configured_llm
+from utils import check_env_vars, format_score, print_section_header, get_llm as get_configured_llm, load_yaml
 from metrics import evaluate_f1_score, evaluate_clarity, evaluate_precision
+
+# Fix para Windows PowerShell encoding
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding='utf-8')
 
 load_dotenv()
 
@@ -103,39 +107,63 @@ def create_evaluation_dataset(client: Client, dataset_name: str, jsonl_path: str
 
 
 def pull_prompt_from_langsmith(prompt_name: str) -> ChatPromptTemplate:
+    """
+    Carrega um prompt de um arquivo YAML local.
+    Usa o arquivo prompts/bug_to_user_story_v2.yml se existir, senão usa v1.
+    
+    Args:
+        prompt_name: Nome do prompt (ex: "bug_to_user_story_v2")
+    
+    Returns:
+        ChatPromptTemplate com o prompt carregado
+    """
     try:
-        print(f"   Puxando prompt do LangSmith Hub: {prompt_name}")
-        prompt = hub.pull(prompt_name)
-        print(f"   ✓ Prompt carregado com sucesso")
+        # Tentar primeiro a versão v2 (otimizada)
+        yaml_paths = [
+            f"prompts/bug_to_user_story_v2.yml",
+            f"prompts/bug_to_user_story_v1.yml"
+        ]
+        
+        prompt_data = None
+        loaded_from = None
+        
+        for yaml_path in yaml_paths:
+            if Path(yaml_path).exists():
+                print(f"   Carregando prompt de: {yaml_path}")
+                prompt_data = load_yaml(yaml_path)
+                loaded_from = yaml_path
+                break
+        
+        if not prompt_data:
+            raise FileNotFoundError(f"Nenhum arquivo de prompt encontrado")
+        
+        # Extrair dados do prompt
+        prompt_key = list(prompt_data.keys())[0]
+        prompt_info = prompt_data[prompt_key]
+        
+        system_prompt = prompt_info.get("system_prompt", "")
+        user_prompt_template = prompt_info.get("user_prompt", "{bug_report}")
+        
+        # Criar ChatPromptTemplate
+        from langchain_core.prompts import ChatPromptTemplate
+        
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", system_prompt),
+            ("human", user_prompt_template)
+        ])
+        
+        print(f"   ✓ Prompt carregado com sucesso de {loaded_from}")
         return prompt
 
     except Exception as e:
-        error_msg = str(e).lower()
-
         print(f"\n{'=' * 70}")
         print(f"❌ ERRO: Não foi possível carregar o prompt '{prompt_name}'")
         print(f"{'=' * 70}\n")
-
-        if "not found" in error_msg or "404" in error_msg:
-            print("⚠️  O prompt não foi encontrado no LangSmith Hub.\n")
-            print("AÇÕES NECESSÁRIAS:")
-            print("1. Verifique se você já fez push do prompt otimizado:")
-            print(f"   python src/push_prompts.py")
-            print()
-            print("2. Confirme se o prompt foi publicado com sucesso em:")
-            print(f"   https://smith.langchain.com/prompts")
-            print()
-            print(f"3. Certifique-se de que o nome do prompt está correto: '{prompt_name}'")
-            print()
-            print("4. Se você alterou o prompt no YAML, refaça o push:")
-            print(f"   python src/push_prompts.py")
-        else:
-            print(f"Erro técnico: {e}\n")
-            print("Verifique:")
-            print("- LANGSMITH_API_KEY está configurada corretamente no .env")
-            print("- Você tem acesso ao workspace do LangSmith")
-            print("- Sua conexão com a internet está funcionando")
-
+        print(f"Erro: {e}\n")
+        print("AÇÕES NECESSÁRIAS:")
+        print("1. Certifique-se que o arquivo prompts/bug_to_user_story_v2.yml ou v1.yml existe")
+        print("2. Se você está na primeira iteração, execute primeiro:")
+        print(f"   python src/pull_prompts.py")
         print(f"\n{'=' * 70}\n")
         raise
 
